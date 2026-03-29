@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Chá de Bebê</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f8ff; color: #333; text-align: center; }
+        .container { max-width: 600px; margin: 50px auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .item-card { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
+        .item-card.comprado { opacity: 0.5; background-color: #f9f9f9; }
+        .btn-comprar { background-color: #ffb6c1; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-comprar:disabled { background-color: #ccc; cursor: not-allowed; }
+        a { color: #87ceeb; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🍼 Chá de Bebê</h1>
+    <p>Escolha um item para nos presentear:</p>
+    <div id="lista-itens">Carregando lista...</div>
+</div>
+
+<script>
+    const URL_API = "SUA_URL_DO_APPS_SCRIPT_AQUI";
+
+    // Função para carregar itens da planilha
+    async function carregarItens() {
+        const response = await fetch(URL_API);
+        const itens = await response.json();
+        const container = document.getElementById('lista-itens');
+        container.innerHTML = '';
+
+        itens.forEach(row => {
+            const [nome, link, valor, status] = row;
+            const isComprado = status === "SIM";
+            
+            const div = document.createElement('div');
+            div.className = `item-card ${isComprado ? 'comprado' : ''}`;
+            div.innerHTML = `
+                <div>
+                    <strong>${nome}</strong><br>
+                    <small>Valor aprox: R$ ${valor}</small><br>
+                    <a href="${link}" target="_blank">Ver sugestão</a>
+                </div>
+                <button class="btn-comprar" ${isComprado ? 'disabled' : ''} onclick="marcarComprado('${nome}')">
+                    ${isComprado ? 'Já Escolhido' : 'Vou Presentear'}
+                </button>
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    // Função para salvar no Google Sheets
+    async function marcarComprado(nomeItem) {
+        if(!confirm("Confirmar que você vai presentear este item?")) return;
+
+        await fetch(URL_API, {
+            method: 'POST',
+            body: JSON.stringify({ item: nomeItem })
+        });
+
+        alert("Obrigado! O item foi reservado.");
+        carregarItens(); // Atualiza a lista
+    }
+
+    carregarItens();
+</script>
+</body>
+</html>
