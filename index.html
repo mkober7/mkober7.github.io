@@ -40,25 +40,64 @@
             gap: 15px;
         }
 
-        .item-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            border: 1px solid #eee;
-            border-radius: 12px;
-            transition: transform 0.2s, background-color 0.3s;
-        }
+        /* Atualização do Container do Cartão para alinhar com a foto */
+.item-card {
+    display: flex;
+    justify-content: flex-start; /* Alinha os elementos no início (esquerda) */
+    align-items: center;
+    padding: 15px; /* Reduzi um pouco o padding para caber tudo */
+    border: 1px solid #eee;
+    border-radius: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    gap: 15px; /* Espaço entre a foto, o texto e o botão */
+}
 
-        .item-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
+/* Container fixo para a imagem */
+.item-img-container {
+    width: 80px;  /* Largura fixa da foto */
+    height: 80px; /* Altura fixa da foto */
+    flex-shrink: 0; /* Impede que a foto esmague em telas menores */
+    border-radius: 8px;
+    overflow: hidden; /* Garante que a imagem não saia do quadrado */
+    border: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #fafafa;
+}
 
-        .item-info { text-align: left; flex-grow: 1; }
-        .item-info strong { font-size: 1.1rem; display: block; margin-bottom: 5px; }
-        .item-info a { color: #5dade2; text-decoration: none; font-size: 0.9rem; }
-        .item-info a:hover { text-decoration: underline; }
+/* Estilo da foto em si */
+.item-foto {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Recorta a imagem para preencher o quadrado sem distorcer */
+}
+
+/* Garante que a info ocupe o espaço restante */
+.item-info {
+    text-align: left;
+    flex-grow: 1;
+}
+
+/* Estilização da Observação (melhorado) */
+.item-obs {
+    display: block;
+    color: #666;
+    margin-bottom: 3px;
+    font-size: 0.85rem;
+    line-height: 1.2;
+}
+
+.item-valor {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+/* Seletor para aplicar filtro na imagem quando comprado */
+.item-card.comprado .item-foto {
+    filter: grayscale(1);
+    opacity: 0.6;
+}
 
         .btn-comprar {
             background-color: var(--primary-color);
@@ -123,25 +162,35 @@
             
             container.innerHTML = ''; 
 
-            itens.forEach(row => {
-    // Agora desestruturamos 5 colunas: Item, Link, Valor, Status, Obs
-    const [nome, linkPlanilha, valor, status, obs] = row;
+           itens.forEach(row => {
+    // Agora desestruturamos 6 colunas na ordem da planilha:
+    // Item, LinkItem, Valor, Status, Obs, LinkImagem
+    const [nome, linkPlanilha, valor, status, obs, linkImagem] = row;
     const isComprado = String(status).toUpperCase() === "SIM";
     
+    // 1. Ajuste de Link do Presente: Garante prefixo http
     let linkFinal = linkPlanilha;
     if (linkFinal && !linkFinal.startsWith('http')) {
         linkFinal = 'https://' + linkFinal;
     }
 
+    // 2. Lógica da Imagem: Usa uma imagem padrão se não houver link na planilha
+    // Você pode substituir URL_IMAGEM_PADRAO por um link de ícone de presente, por exemplo.
+    const imagemPadrao = 'https://via.placeholder.com/80?text=👶'; 
+    const srcImagem = (linkImagem && linkImagem.startsWith('http')) ? linkImagem : imagemPadrao;
+
     const div = document.createElement('div');
     div.className = `item-card ${isComprado ? 'comprado' : ''}`;
     
-    // O trecho abaixo verifica se existe observação para exibi-la
+    // O trecho abaixo agora inclui o container da imagem
     div.innerHTML = `
+        <div class="item-img-container">
+            <img src="${srcImagem}" alt="Imagem de ${nome}" class="item-foto">
+        </div>
         <div class="item-info">
             <strong>${nome}</strong>
-            ${obs ? `<small style="display:block; color:#666; margin-bottom:5px;">📝 ${obs}</small>` : ''}
-            <span>Valor aprox: R$ ${valor}</span><br>
+            ${obs ? `<small class="item-obs">📝 ${obs}</small>` : ''}
+            <span class="item-valor">Valor aprox: R$ ${valor}</span><br>
             ${linkFinal ? `<a href="${linkFinal}" target="_blank" rel="noopener noreferrer">Onde encontrar 🔗</a>` : ''}
         </div>
         <button 
