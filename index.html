@@ -2,69 +2,189 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>Lista de Chá de Bebê</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Chá de Bebê Interativa</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background-color: #f0f8ff; color: #333; text-align: center; }
-        .container { max-width: 600px; margin: 50px auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .item-card { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #eee; }
-        .item-card.comprado { opacity: 0.5; background-color: #f9f9f9; }
-        .btn-comprar { background-color: #ffb6c1; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
-        .btn-comprar:disabled { background-color: #ccc; cursor: not-allowed; }
-        a { color: #87ceeb; text-decoration: none; }
+        :root {
+            --primary-color: #ffb6c1; /* Rosa claro / Azul bebê: #add8e6 */
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-main: #4a4a4a;
+            --status-comprado: #d1d1d1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        h1 { color: var(--primary-color); margin-bottom: 10px; }
+        .subtitle { margin-bottom: 30px; font-style: italic; color: #888; }
+
+        #lista-itens {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .item-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            transition: transform 0.2s, background-color 0.3s;
+        }
+
+        .item-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .item-info { text-align: left; flex-grow: 1; }
+        .item-info strong { font-size: 1.1rem; display: block; margin-bottom: 5px; }
+        .item-info a { color: #5dade2; text-decoration: none; font-size: 0.9rem; }
+        .item-info a:hover { text-decoration: underline; }
+
+        .btn-comprar {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            margin-left: 15px;
+        }
+
+        .btn-comprar:hover { background-color: #ff9aa9; }
+
+        /* Estilo para itens já reservados */
+        .item-card.comprado {
+            background-color: #fafafa;
+            border-left: 8px solid var(--status-comprado);
+            opacity: 0.7;
+        }
+
+        .item-card.comprado strong {
+            text-decoration: line-through;
+            color: #999;
+        }
+
+        .btn-comprar:disabled {
+            background-color: var(--status-comprado);
+            cursor: not-allowed;
+        }
+
+        .loading-spinner {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>🍼 Chá de Bebê</h1>
-    <p>Escolha um item para nos presentear:</p>
-    <div id="lista-itens">Carregando lista...</div>
+    <h1>🍼 Nosso Chá de Bebê</h1>
+    <p class="subtitle">Sua presença é nosso maior presente, mas se desejar nos ajudar com algo, escolha um item abaixo:</p>
+    
+    <div id="lista-itens">
+        <div class="loading-spinner">Carregando lista de mimos...</div>
+    </div>
 </div>
 
 <script>
-    const URL_API = "https://script.google.com/macros/s/AKfycbzRhVSaFvHNsKrVivOc1IMAoPnQb970ozEYLGxYPasy1TW2cukPOSt6jSAzgx6P3UANow/exec";
+    // IMPORTANTE: Cole aqui a URL gerada no Google Apps Script
+    const URL_API = "SUA_URL_DO_APPS_SCRIPT_AQUI";
 
-    // Função para carregar itens da planilha
+    // Função para buscar dados do Google Sheets
     async function carregarItens() {
-        const response = await fetch(URL_API);
-        const itens = await response.json();
         const container = document.getElementById('lista-itens');
-        container.innerHTML = '';
-
-        itens.forEach(row => {
-            const [nome, link, valor, status] = row;
-            const isComprado = status === "SIM";
+        
+        try {
+            const response = await fetch(URL_API);
+            const itens = await response.json();
             
-            const div = document.createElement('div');
-            div.className = `item-card ${isComprado ? 'comprado' : ''}`;
-            div.innerHTML = `
-                <div>
-                    <strong>${nome}</strong><br>
-                    <small>Valor aprox: R$ ${valor}</small><br>
-                    <a href="${link}" target="_blank">Ver sugestão</a>
-                </div>
-                <button class="btn-comprar" ${isComprado ? 'disabled' : ''} onclick="marcarComprado('${nome}')">
-                    ${isComprado ? 'Já Escolhido' : 'Vou Presentear'}
-                </button>
-            `;
-            container.appendChild(div);
-        });
+            container.innerHTML = ''; 
+
+            itens.forEach(row => {
+                const [nome, link, valor, status] = row;
+                const isComprado = String(status).toUpperCase() === "SIM";
+                
+                const div = document.createElement('div');
+                div.className = `item-card ${isComprado ? 'comprado' : ''}`;
+                div.innerHTML = `
+                    <div class="item-info">
+                        <strong>${nome}</strong>
+                        <span>Valor aprox: R$ ${valor}</span><br>
+                        ${link ? `<a href="${link}" target="_blank">Onde encontrar 🔗</a>` : ''}
+                    </div>
+                    <button 
+                        class="btn-comprar" 
+                        ${isComprado ? 'disabled' : ''} 
+                        onclick="marcarComprado(this, '${nome}')">
+                        ${isComprado ? 'Já Reservado' : 'Vou Presentear'}
+                    </button>
+                `;
+                container.appendChild(div);
+            });
+        } catch (erro) {
+            container.innerHTML = "Não foi possível carregar a lista agora. 😢";
+            console.error("Erro na busca:", erro);
+        }
     }
 
-    // Função para salvar no Google Sheets
-    async function marcarComprado(nomeItem) {
-        if(!confirm("Confirmar que você vai presentear este item?")) return;
+    // Função para registrar a compra e atualizar a tela
+    async function marcarComprado(botao, nomeItem) {
+        if(!confirm(`Você deseja reservar o item "${nomeItem}"? Isso evitará que outras pessoas comprem o mesmo.`)) return;
 
-        await fetch(URL_API, {
-            method: 'POST',
-            body: JSON.stringify({ item: nomeItem })
-        });
+        // Feedback imediato no botão
+        const originalText = botao.innerText;
+        botao.disabled = true;
+        botao.innerText = "Reservando...";
 
-        alert("Obrigado! O item foi reservado.");
-        carregarItens(); // Atualiza a lista
+        try {
+            // Envia para o Google Sheets
+            await fetch(URL_API, {
+                method: 'POST',
+                mode: 'no-cors', // Necessário para evitar erros de política de origem (CORS)
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ item: nomeItem })
+            });
+
+            // Feedback de sucesso
+            alert("Muito obrigado! O item foi reservado com sucesso.");
+            
+            // Aguarda um momento para o Google processar e recarrega a lista
+            setTimeout(carregarItens, 800);
+
+        } catch (erro) {
+            alert("Houve um erro ao salvar sua escolha. Tente novamente, por favor.");
+            botao.disabled = false;
+            botao.innerText = originalText;
+            console.error("Erro no envio:", erro);
+        }
     }
 
-    carregarItens();
+    // Inicia a carga quando a página abre
+    window.onload = carregarItens;
 </script>
+
 </body>
 </html>
