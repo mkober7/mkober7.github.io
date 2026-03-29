@@ -124,26 +124,35 @@
             container.innerHTML = ''; 
 
             itens.forEach(row => {
-                const [nome, link, valor, status] = row;
-                const isComprado = String(status).toUpperCase() === "SIM";
-                
-                const div = document.createElement('div');
-                div.className = `item-card ${isComprado ? 'comprado' : ''}`;
-                div.innerHTML = `
-                    <div class="item-info">
-                        <strong>${nome}</strong>
-                        <span>Valor aprox: R$ ${valor}</span><br>
-                        ${link ? `<a href="${link}" target="_blank">Onde encontrar 🔗</a>` : ''}
-                    </div>
-                    <button 
-                        class="btn-comprar" 
-                        ${isComprado ? 'disabled' : ''} 
-                        onclick="marcarComprado(this, '${nome}')">
-                        ${isComprado ? 'Já Reservado' : 'Vou Presentear'}
-                    </button>
-                `;
-                container.appendChild(div);
-            });
+    // Agora desestruturamos 5 colunas: Item, Link, Valor, Status, Obs
+    const [nome, linkPlanilha, valor, status, obs] = row;
+    const isComprado = String(status).toUpperCase() === "SIM";
+    
+    let linkFinal = linkPlanilha;
+    if (linkFinal && !linkFinal.startsWith('http')) {
+        linkFinal = 'https://' + linkFinal;
+    }
+
+    const div = document.createElement('div');
+    div.className = `item-card ${isComprado ? 'comprado' : ''}`;
+    
+    // O trecho abaixo verifica se existe observação para exibi-la
+    div.innerHTML = `
+        <div class="item-info">
+            <strong>${nome}</strong>
+            ${obs ? `<small style="display:block; color:#666; margin-bottom:5px;">📝 ${obs}</small>` : ''}
+            <span>Valor aprox: R$ ${valor}</span><br>
+            ${linkFinal ? `<a href="${linkFinal}" target="_blank" rel="noopener noreferrer">Onde encontrar 🔗</a>` : ''}
+        </div>
+        <button 
+            class="btn-comprar" 
+            ${isComprado ? 'disabled' : ''} 
+            onclick="marcarComprado(this, '${nome}')">
+            ${isComprado ? 'Já Reservado' : 'Vou Presentear'}
+        </button>
+    `;
+    container.appendChild(div);
+});
         } catch (erro) {
             container.innerHTML = "Não foi possível carregar a lista agora. 😢";
             console.error("Erro na busca:", erro);
