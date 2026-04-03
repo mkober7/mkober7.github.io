@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Chá de Bebê Interativa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-color: #208744; /* verde, #ffb6c1; Rosa claro / Azul bebê: #add8e6 */
@@ -40,6 +41,21 @@
             gap: 15px;
         }
 
+
+.nome-bebe {
+    font-family: 'Dancing Script', cursive;
+    font-size: 3.5rem; /* Tamanho grande para destaque */
+    color: var(--primary-color);
+    margin: -10px 0 20px 0; /* Ajusta o espaço entre o título e o texto */
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Ajuste para o nome não ficar gigante no celular */
+@media (max-width: 480px) {
+    .nome-bebe {
+        font-size: 2.8rem;
+    }
+}
         /* Atualização do Container do Cartão para alinhar com a foto */
 .item-card {
     display: flex;
@@ -180,6 +196,7 @@
 
 <div class="container">
     <h1>🍼 Nosso Chá de Bebê</h1>
+    <div class="nome-bebe">Romeo</div>
     <p class="subtitle">Sua presença é nosso maior presente 🧡, mas se desejar presentear o Romeo 👶, aqui estão alguns itens que serão bem vindos, ou se preferir fazer um PIX no código abaixo, nós mesmos iremos adquirir os produtos 😊</p>
     <p class="subtitle">PIX na chave 📱 51 99844 6405 para Raquel Hauschild</p>
     <p class="subtitle">Se desejar nos presentear com fraldas, aceitamos Pampers Confort Sec ou Pampers Premium Care tamanhos P, M e G</p>
