@@ -93,42 +93,42 @@
     color: #555;
 }
 
-        /* --- Ajustes para Mobile (Celulares) --- */
+/* --- Ajustes para Mobile (Celulares) --- */
 @media (max-width: 480px) {
     .container {
         padding: 15px;
-        margin: 10px;
+        margin: 5px;
     }
 
     .item-card {
-        flex-direction: column; /* Empilha os itens verticalmente */
-        align-items: flex-start;
-        padding: 20px;
+        display: flex;
+        flex-wrap: wrap; /* Permite que o botão pule para a linha de baixo */
+        align-items: center;
+        padding: 15px;
         gap: 10px;
     }
 
+    /* Mantém a imagem no tamanho original à esquerda */
     .item-img-container {
-        width: 100%;      /* Imagem ocupa toda a largura */
-        height: 180px;    /* Aumentamos a altura para destaque no mobile */
-        margin-bottom: 5px;
+        width: 80px; 
+        height: 80px;
+        flex-shrink: 0;
     }
 
+    /* Informações ocupam o resto da linha ao lado da foto */
     .item-info {
-        width: 100%;      /* Texto ocupa toda a largura */
-        text-align: center; /* Centraliza o texto para melhor estética mobile */
+        flex: 1; /* Ocupa o espaço restante ao lado da imagem */
+        min-width: 150px; /* Garante que não fique espremido demais */
+        text-align: left;
     }
 
-    .item-obs {
-        margin-top: 5px;
-        margin-bottom: 8px;
-    }
-
+    /* Força o botão a ocupar a linha de baixo inteira */
     .btn-comprar {
-        width: 100%;      /* Botão ocupa toda a largura */
-        margin-left: 0;   /* Remove a margem lateral que existia no desktop */
-        margin-top: 10px;
-        padding: 15px;    /* Botão maior para facilitar o toque */
-        font-size: 1rem;
+        width: 100%;      /* Ocupa 100% da largura do card */
+        margin-left: 0;   /* Remove margens laterais */
+        margin-top: 10px; /* Espaço entre o texto e o botão */
+        padding: 12px;
+        order: 3;         /* Garante que ele seja o último elemento */
     }
 }
 
